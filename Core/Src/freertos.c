@@ -45,7 +45,13 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
+/* Definitions for Usart1Mutex */
+// 创建Usart1锁
+osMutexId_t Usart1MutexHandle;
+// 定义Usart1锁的相关属性
+const osMutexAttr_t Usart1Mutex_attributes = {
+  .name = "Usart1Mutex"
+};
 /* USER CODE END Variables */
 /* Definitions for VolSignTask */
 osThreadId_t VolSignTaskHandle;
@@ -80,6 +86,12 @@ osMessageQueueId_t VolQueueHandle;
 const osMessageQueueAttr_t VolQueue_attributes = {
   .name = "VolQueue"
 };
+/* Definitions for MotorCmdQueue */
+osMessageQueueId_t MotorCmdQueueHandle;
+const osMessageQueueAttr_t MotorCmdQueue_attributes = {
+  .name = "MotorCmdQueue"
+};
+
 /* Definitions for MotorQueue */
 osMessageQueueId_t MotorQueueHandle;
 const osMessageQueueAttr_t MotorQueue_attributes = {
@@ -92,7 +104,7 @@ const osMessageQueueAttr_t MotorQueue_attributes = {
 /* USER CODE END FunctionPrototypes */
 
 void StartVolSignTask(void *argument);
-extern void startMotorCtrlTask(void *argument);
+extern void  StartMotorCtrlTask(void *argument);
 extern void StartMotorDataTask(void *argument);
 extern void StartVolDataTask(void *argument);
 
@@ -110,6 +122,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
+  /* creation of Usart1Mutex */
+  Usart1MutexHandle = osMutexNew(&Usart1Mutex_attributes);
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
@@ -124,6 +138,10 @@ void MX_FREERTOS_Init(void) {
   /* creation of VolQueue */
   VolQueueHandle = osMessageQueueNew (16, sizeof(uint16_t), &VolQueue_attributes);
 
+  /* creation of MotorCmdQueue */
+  // Create a queue that can hold 10 items, each item is a float (speed)
+  MotorCmdQueueHandle = osMessageQueueNew (10, sizeof(float), &MotorCmdQueue_attributes);
+
   /* creation of MotorQueue */
   MotorQueueHandle = osMessageQueueNew (16, sizeof(MotorMessage*), &MotorQueue_attributes);
 
@@ -136,7 +154,7 @@ void MX_FREERTOS_Init(void) {
   VolSignTaskHandle = osThreadNew(StartVolSignTask, NULL, &VolSignTask_attributes);
 
   /* creation of MotorCtrlTask */
-  MotorCtrlTaskHandle = osThreadNew(startMotorCtrlTask, NULL, &MotorCtrlTask_attributes);
+  MotorCtrlTaskHandle = osThreadNew(StartMotorCtrlTask, NULL, &MotorCtrlTask_attributes);
 
   /* creation of MotorDataTask */
   MotorDataTaskHandle = osThreadNew(StartMotorDataTask, NULL, &MotorDataTask_attributes);

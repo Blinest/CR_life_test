@@ -24,8 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "motor.h"
-#include "kinematics.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
