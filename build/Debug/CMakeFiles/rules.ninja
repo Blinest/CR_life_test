@@ -72,7 +72,7 @@ rule C_COMPILER__FreeRTOS_unscanned_Debug
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "D:\6_application\6_9_Program\6_9_1_IDE\CLion 2025.3.1\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -SD:\7_code\project\CR_life_test -BD:\7_code\project\CR_life_test\build\Debug
+  command = "D:\6_application\6_9_Program\6_9_1_IDE\CLion 2025.3.1\bin\cmake\win\x64\bin\cmake.exe" --regenerate-during-build -SC:\Users\q3634\Desktop\inspection_robot\control\CR_life_test -BC:\Users\q3634\Desktop\inspection_robot\control\CR_life_test\build\Debug
   description = Re-running CMake...
   generator = 1
 

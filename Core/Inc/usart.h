@@ -29,7 +29,10 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include "fifo.h"
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;
@@ -44,7 +47,15 @@ void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+extern __IO bool rxFrameFlag;
+extern __IO uint8_t rxCmd[FIFO_SIZE];
+extern __IO uint8_t rxCount;
+extern __IO bool rxFrameFlag2;     // USART2 帧接收完成标志
+extern __IO uint8_t rxCmd2[FIFO_SIZE]; // USART2 接收缓冲区
+extern __IO uint8_t rxCount2;           // USART2 接收数据长度
 
+void Usart_SendString(UART_HandleTypeDef* huart, unsigned char *str, unsigned short len);
+void UsartPrintf(UART_HandleTypeDef* huart, const char *fmt,...);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

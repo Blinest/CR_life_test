@@ -33,6 +33,9 @@ enable_language(C ASM)
 
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME}
+
+
+
 )
 
 # Add STM32CubeMX generated sources
@@ -45,14 +48,38 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-    # Add user sources here
-        Core/App/Tasks/volTask.c
+    # Add user sources her
+        App/Tasks/MotorCtrlTask.c
+        App/Tasks/MotorDataTask.c
+        App/Tasks/PressDataTask.c
+        App/Tasks/PressSignTask.c
+        App/Common/utils.c
+        App/Net/onenet.c
+        App/Net/onenet.h
+        App/Net/cJSON.c
+        App/Net/cJSON.h
+        App/Net/MqttKit.c
+        App/Net/MqttKit.h
+        App/Net/Common.h
+        Drivers/BSP/Motor/Emm_V5.h
+        Drivers/BSP/Motor/Emm_V5.c
+        Drivers/BSP/Motor/motor.c
+        Drivers/BSP/Motor/motor.h
+        Drivers/BSP/PressSensor/pressSensor.c
+        Drivers/BSP/PressSensor/pressSensor.h
+        Drivers/fifo.c
+        Drivers/fifo.h
+        Core/Src/Command.c
+        Core/Inc/Command.h
+        App/Net/ESP8266.c
+        App/Net/ESP8266.h
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
-        Core/App
+        App
+        Drivers
 )
 
 # Add project symbols (macros)

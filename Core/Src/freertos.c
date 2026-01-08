@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Types/MotorCtrlType.h"
+#include "Types/MotorType.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,10 +53,10 @@ const osMutexAttr_t Usart1Mutex_attributes = {
   .name = "Usart1Mutex"
 };
 /* USER CODE END Variables */
-/* Definitions for VolSignTask */
-osThreadId_t VolSignTaskHandle;
-const osThreadAttr_t VolSignTask_attributes = {
-  .name = "VolSignTask",
+/* Definitions for PressSignTask */
+osThreadId_t PressSignTaskHandle;
+const osThreadAttr_t PressSignTask_attributes = {
+  .name = "PressSignTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -74,24 +74,18 @@ const osThreadAttr_t MotorDataTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for VolDataTask */
-osThreadId_t VolDataTaskHandle;
-const osThreadAttr_t VolDataTask_attributes = {
-  .name = "VolDataTask",
+/* Definitions for PressDataTask */
+osThreadId_t PressDataTaskHandle;
+const osThreadAttr_t PressDataTask_attributes = {
+  .name = "PressDataTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for VolQueue */
-osMessageQueueId_t VolQueueHandle;
-const osMessageQueueAttr_t VolQueue_attributes = {
-  .name = "VolQueue"
+/* Definitions for PressQueue */
+osMessageQueueId_t PressQueueHandle;
+const osMessageQueueAttr_t PressQueue_attributes = {
+  .name = "PressQueue"
 };
-/* Definitions for MotorCmdQueue */
-osMessageQueueId_t MotorCmdQueueHandle;
-const osMessageQueueAttr_t MotorCmdQueue_attributes = {
-  .name = "MotorCmdQueue"
-};
-
 /* Definitions for MotorQueue */
 osMessageQueueId_t MotorQueueHandle;
 const osMessageQueueAttr_t MotorQueue_attributes = {
@@ -103,10 +97,10 @@ const osMessageQueueAttr_t MotorQueue_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartVolSignTask(void *argument);
-extern void  StartMotorCtrlTask(void *argument);
+void StartPressSignTask(void *argument);
+extern void StartMotorCtrlTask(void *argument);
 extern void StartMotorDataTask(void *argument);
-extern void StartVolDataTask(void *argument);
+extern void StartPressDataTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -135,12 +129,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
-  /* creation of VolQueue */
-  VolQueueHandle = osMessageQueueNew (16, sizeof(uint16_t), &VolQueue_attributes);
-
-  /* creation of MotorCmdQueue */
-  // Create a queue that can hold 10 items, each item is a float (speed)
-  MotorCmdQueueHandle = osMessageQueueNew (10, sizeof(float), &MotorCmdQueue_attributes);
+  /* creation of PressQueue */
+  PressQueueHandle = osMessageQueueNew (16, sizeof(uint16_t), &PressQueue_attributes);
 
   /* creation of MotorQueue */
   MotorQueueHandle = osMessageQueueNew (16, sizeof(MotorMessage*), &MotorQueue_attributes);
@@ -150,8 +140,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of VolSignTask */
-  VolSignTaskHandle = osThreadNew(StartVolSignTask, NULL, &VolSignTask_attributes);
+  /* creation of PressSignTask */
+  PressSignTaskHandle = osThreadNew(StartPressSignTask, NULL, &PressSignTask_attributes);
 
   /* creation of MotorCtrlTask */
   MotorCtrlTaskHandle = osThreadNew(StartMotorCtrlTask, NULL, &MotorCtrlTask_attributes);
@@ -159,8 +149,8 @@ void MX_FREERTOS_Init(void) {
   /* creation of MotorDataTask */
   MotorDataTaskHandle = osThreadNew(StartMotorDataTask, NULL, &MotorDataTask_attributes);
 
-  /* creation of VolDataTask */
-  VolDataTaskHandle = osThreadNew(StartVolDataTask, NULL, &VolDataTask_attributes);
+  /* creation of PressDataTask */
+  PressDataTaskHandle = osThreadNew(StartPressDataTask, NULL, &PressDataTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -172,22 +162,22 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartVolSignTask */
+/* USER CODE BEGIN Header_StartPressSignTask */
 /**
-  * @brief  Function implementing the VolSignTask thread.
+  * @brief  Function implementing the PressSignTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartVolSignTask */
-__weak void StartVolSignTask(void *argument)
+/* USER CODE END Header_StartPressSignTask */
+__weak void StartPressSignTask(void *argument)
 {
-  /* USER CODE BEGIN StartVolSignTask */
+  /* USER CODE BEGIN StartPressSignTask */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END StartVolSignTask */
+  /* USER CODE END StartPressSignTask */
 }
 
 /* Private application code --------------------------------------------------*/

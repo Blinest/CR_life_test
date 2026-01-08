@@ -1,9 +1,9 @@
-set(CMAKE_HOST_SYSTEM "Windows-10.0.22000")
+set(CMAKE_HOST_SYSTEM "Windows-10.0.26100")
 set(CMAKE_HOST_SYSTEM_NAME "Windows")
-set(CMAKE_HOST_SYSTEM_VERSION "10.0.22000")
+set(CMAKE_HOST_SYSTEM_VERSION "10.0.26100")
 set(CMAKE_HOST_SYSTEM_PROCESSOR "AMD64")
 
-include("D:/7_code/project/CR_life_test/cmake/gcc-arm-none-eabi.cmake")
+include("C:/Users/q3634/Desktop/inspection_robot/control/CR_life_test/cmake/gcc-arm-none-eabi.cmake")
 
 set(CMAKE_SYSTEM "Generic")
 set(CMAKE_SYSTEM_NAME "Generic")
