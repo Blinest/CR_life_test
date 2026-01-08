@@ -2,10 +2,6 @@
 * @file MotorCtrlTask.c
  * @brief 电机控制模块
  *
- * 本模块提供电机控制功能：
- * - MotorInit()：电机初始化，包括电机使能、电机速度设置等
- * - SendMotorCommand()：发送电机控制指令
- * - GenerateMotorCtrlCommand()：上层实现电机控制，底层调用商家提供的指令集或库函数
  *
  * 任务流程：获取电机控制指令 → 申请Usart1Mutex → 通过USART1发送电机控制命令 → 释放Usart1Mutex → 等待执行结果
  *
@@ -16,6 +12,8 @@
 #include "main.h"
 #include "usart.h"
 #include "Types/MotorType.h"
+#include "BSP/Motor/Emm_V5.h"
+#include "BSP/Motor/motor.h"
 
 /* External variables --------------------------------------------------------*/
 
@@ -37,17 +35,24 @@ static uint8_t MotorRxBuffer[MOTOR_RX_BUFFER_SIZE] __attribute__((unused));
 // Please ensure freertos.c is updated to StartMotorCtrlTask if it was startMotorCtrlTask.
 void StartMotorCtrlTask(void *argument)
 {
-    float newTargetSpeed __attribute__((unused));
-    osStatus_t status __attribute__((unused));
+    osStatus_t status;
+    uint8_t motor_addr = 1; // 电机地址，根据实际情况修改
 
     for(;;)
     {
-        // TODO:发送指令
-
-
-        // TODO:接收指令
-
-
+        // 申请 Usart1Mutex
+        status = osMutexAcquire(Usart1MutexHandle, osWaitForever);
+        if (status == osOK)
+        {
+            // 发送电机使能指令
+            Emm_V5_En_Control(motor_addr, true, false);
+            
+            // 释放 Usart1Mutex
+            osMutexRelease(Usart1MutexHandle);
+        }
+        
+        // 等待一段时间后再次发送指令
+        osDelay(1000);
     }
 
 }

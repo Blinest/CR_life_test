@@ -134,3 +134,9 @@
 815	1694	7895828926321158	CR_life_test.elf	663d637916ae3396
 17	830	7895831970208908	CMakeFiles/CR_life_test.dir/App/Net/ESP8266.c.obj	3e207588d389df5b
 833	1908	7895831978369190	CR_life_test.elf	663d637916ae3396
+17	937	7895844511494110	CMakeFiles/CR_life_test.dir/App/Tasks/MotorCtrlTask.c.obj	c0b4369ac9e2a70e
+39	994	7895844511721599	CMakeFiles/CR_life_test.dir/App/Tasks/MotorDataTask.c.obj	aa9891b5e4f918f7
+995	2000	7895844521268395	CR_life_test.elf	663d637916ae3396
+18	870	7895845625177024	CMakeFiles/CR_life_test.dir/App/Tasks/MotorCtrlTask.c.obj	c0b4369ac9e2a70e
+32	878	7895845625312827	CMakeFiles/CR_life_test.dir/App/Tasks/MotorDataTask.c.obj	aa9891b5e4f918f7
+879	1754	7895845633789076	CR_life_test.elf	663d637916ae3396
