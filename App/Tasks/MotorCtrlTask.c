@@ -21,38 +21,32 @@ extern osMutexId_t Usart1MutexHandle;
 extern osMessageQueueId_t MotorQueueHandle;
 
 
-// 申请 Usart1Mutex
-static float currentTargetSpeed __attribute__((unused)) = 0.0f;
-static float lastSentSpeed __attribute__((unused)) = -1.0f; // Initialized to a value unlikely to be 0 to ensure first send
-
-// Placeholder for received motor feedback
-#define MOTOR_RX_BUFFER_SIZE 32
-static uint8_t MotorRxBuffer[MOTOR_RX_BUFFER_SIZE] __attribute__((unused));
-
-
-
-// Note: Function name capitalized to match naming convention. 
-// Please ensure freertos.c is updated to StartMotorCtrlTask if it was startMotorCtrlTask.
 void StartMotorCtrlTask(void *argument)
 {
     osStatus_t status;
-    uint8_t motor_addr = 1; // 电机地址，根据实际情况修改
-
+    uint8_t motor_addr = 4; // 电机地址，根据实际情况修改，三电机地址为4,5,6
+    //Usart_SendString(&huart2, "【StartMotorCtrlTask】start In for",32);
     for(;;)
     {
         // 申请 Usart1Mutex
+        //Usart_SendString(&huart2, "【StartMotorCtrlTask】In for",16);
         status = osMutexAcquire(Usart1MutexHandle, osWaitForever);
         if (status == osOK)
         {
             // 发送电机使能指令
             Emm_V5_En_Control(motor_addr, true, false);
             
+            // 等待一段时间，确保有足够时间接收返回值
+            // 115200波特率下，1字节数据传输约需87us，考虑RS485收发切换和系统处理时间
+            // 设置5ms等待时间，确保稳定接收
+            osDelay(5);
+            
             // 释放 Usart1Mutex
             osMutexRelease(Usart1MutexHandle);
         }
         
         // 等待一段时间后再次发送指令
-        osDelay(1000);
+        osDelay(500);
     }
 
 }

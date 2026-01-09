@@ -235,7 +235,7 @@ void ESP8266_Init(void)
 	// 连接OneNet服务器
 	UsartPrintf(&huart2, "5. CIPSTART\r\n");
 	while(ESP8266_SendCmd(ESP8266_ONENET_INFO, "CONNECT"))
-		delay_ms(500);
+		delay_ms(3000);
 
 	UsartPrintf(&huart2, "6. ESP8266 Init OK\r\n");
 }

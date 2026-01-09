@@ -8,10 +8,7 @@
 
 ***	qq：1071378062
 **********************************************************/
-// 电机数据接收缓冲
-extern __IO bool status; // 电机状态
-extern __IO uint8_t rxCmd[FIFO_SIZE];
-extern __IO uint8_t rxCount;
+
 #define MOTOR_NUM 6 //定义电机数量
 typedef struct Steppter_Motor
 {

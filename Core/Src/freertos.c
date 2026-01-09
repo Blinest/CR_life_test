@@ -52,6 +52,12 @@ osMutexId_t Usart1MutexHandle;
 const osMutexAttr_t Usart1Mutex_attributes = {
   .name = "Usart1Mutex"
 };
+// 创建Usart2锁
+osMutexId_t Usart2MutexHandle;
+// 定义Usart2锁的相关属性
+const osMutexAttr_t Usart2Mutex_attributes = {
+  .name = "Usart2Mutex"
+};
 /* USER CODE END Variables */
 /* Definitions for PressSignTask */
 osThreadId_t PressSignTaskHandle;
@@ -72,7 +78,7 @@ osThreadId_t MotorDataTaskHandle;
 const osThreadAttr_t MotorDataTask_attributes = {
   .name = "MotorDataTask",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for PressDataTask */
 osThreadId_t PressDataTaskHandle;
@@ -118,6 +124,8 @@ void MX_FREERTOS_Init(void) {
   /* add mutexes, ... */
   /* creation of Usart1Mutex */
   Usart1MutexHandle = osMutexNew(&Usart1Mutex_attributes);
+  /* creation of Usart2Mutex */
+  Usart2MutexHandle = osMutexNew(&Usart2Mutex_attributes);
   /* USER CODE END RTOS_MUTEX */
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */

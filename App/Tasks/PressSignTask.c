@@ -37,10 +37,10 @@ void StartPressSignTask(void *argument)
     for(;;)
     {
         // 1.发送请求
-        SendPressRequest();
+        // SendPressRequest();
 
         // 2. 等待并接收压力数据
-        ReceivePressData();
+        // ReceivePressData();
 
         // 3. 数据处理并发送给UART2
         osDelay(100); // 100ms sampling rate (adjust as needed)
@@ -52,8 +52,7 @@ static void SendPressRequest(void)
     // Acquire Mutex to protect USART1
     if (osMutexAcquire(Usart1MutexHandle, osWaitForever) == osOK)
     {
-        // TODO: Implement the specific HEX protocol for voltage request
-        // For now, we just send the placeholder command
+        // 发送请求指令
         HAL_UART_Transmit(&huart1, PressRequestCmd, sizeof(PressRequestCmd), 100);
 
         // Release Mutex

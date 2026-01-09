@@ -8,10 +8,10 @@
 ***	CSDN博客：http s://blog.csdn.net/zhangdatou666
 ***	qq交流群：262438510
 **********************************************************/
-// 上层通信封装，使用串口1发送数据
+// 上层通信封装，使用串口1中断发送数据
 void usart_SendCmd(uint8_t *cmd, uint8_t cmd_num)
 {
-  HAL_UART_Transmit(&huart1, (uint8_t *)cmd, cmd_num, 10);
+  HAL_UART_Transmit_DMA(&huart1, cmd, cmd_num);
 }
 /**
   * @brief    将当前位置清零
