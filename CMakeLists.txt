@@ -35,7 +35,6 @@ enable_language(C ASM)
 add_executable(${CMAKE_PROJECT_NAME}
 
 
-
 )
 
 # Add STM32CubeMX generated sources
@@ -49,37 +48,33 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources her
-        App/Tasks/MotorCtrlTask.c
-        App/Tasks/MotorDataTask.c
-        App/Tasks/PressDataTask.c
-        App/Tasks/PressSignTask.c
-        App/Common/utils.c
-        App/Net/onenet.c
-        App/Net/onenet.h
-        App/Net/cJSON.c
-        App/Net/cJSON.h
-        App/Net/MqttKit.c
-        App/Net/MqttKit.h
-        App/Net/Common.h
-        Drivers/BSP/Motor/Emm_V5.h
-        Drivers/BSP/Motor/Emm_V5.c
-        Drivers/BSP/Motor/motor.c
-        Drivers/BSP/Motor/motor.h
-        Drivers/BSP/PressSensor/pressSensor.c
-        Drivers/BSP/PressSensor/pressSensor.h
-        Drivers/fifo.c
-        Drivers/fifo.h
-        Core/Src/Command.c
-        Core/Inc/Command.h
-        App/Net/ESP8266.c
-        App/Net/ESP8266.h
+    App/Tasks/CmdCtrlTask.c
+    App/Tasks/DataTask.c
+    App/Common/utils.c
+    App/Common/cmd_parse.c
+    App/Net/onenet.c
+    App/Net/cJSON.c
+    App/Net/MqttKit.c
+    App/Net/MqttKit.h
+    App/Net/Common.h
+    App/Net/ESP8266.c
+    Drivers/BSP/Motor/Emm_V5.c
+    Drivers/BSP/Motor/motor.c
+    Drivers/BSP/Sensor/pressSensor.c
+    Drivers/BSP/Sensor/trans_modbus.c
+    Drivers/BSP/Sensor/data_processing.c
+    Drivers/fifo.c
+    Drivers/BSP/Motor/CR_life_test.c
+    Drivers/BSP/Motor/kinematic.c
+    Core/Src/Command.c
 )
+
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
-        App
-        Drivers
+    App
+    Drivers
 )
 
 # Add project symbols (macros)

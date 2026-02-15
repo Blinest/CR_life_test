@@ -24,9 +24,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-__IO bool rxFrameFlag = false;
-__IO uint8_t rxCmd[FIFO_SIZE] = {0};
-__IO uint8_t rxCount = 0;
+__IO bool rxFrameFlag1 = false;
+__IO uint8_t rxCmd1[FIFO_SIZE] = {0};
+__IO uint8_t rxCount1 = 0;
 __IO bool rxFrameFlag2 = false;     // USART2 帧接收完成标志
 __IO uint8_t rxCmd2[FIFO_SIZE] = {0}; // USART2 接收缓冲区
 __IO uint8_t rxCount2 = 0;           // USART2 接收数据长度
@@ -34,8 +34,6 @@ __IO uint8_t rxCount2 = 0;           // USART2 接收数据长度
 
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
-DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USART1 init function */
 
@@ -62,9 +60,7 @@ void MX_USART1_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
-  // 启动ReceiveToIdle_DMA接收，使用回调方式处理数据
-  HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rxCmd, sizeof(rxCmd));
-  __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+
   /* USER CODE END USART1_Init 2 */
 
 }
@@ -93,8 +89,7 @@ void MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-  // 启用UART2接收中断
-  __HAL_UART_ENABLE_IT(&huart2, UART_IT_RXNE);
+
   /* USER CODE END USART2_Init 2 */
 
 }
@@ -123,41 +118,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 
     GPIO_InitStruct.Pin = GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    /* USART1 DMA Init */
-    /* USART1_RX Init */
-    hdma_usart1_rx.Instance = DMA1_Channel5;
-    hdma_usart1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_usart1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_usart1_rx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_usart1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_usart1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_usart1_rx.Init.Mode = DMA_NORMAL;
-    hdma_usart1_rx.Init.Priority = DMA_PRIORITY_LOW;
-    if (HAL_DMA_Init(&hdma_usart1_rx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(uartHandle,hdmarx,hdma_usart1_rx);
-
-    /* USART1_TX Init */
-    hdma_usart1_tx.Instance = DMA1_Channel4;
-    hdma_usart1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_usart1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_usart1_tx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_usart1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_usart1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-    hdma_usart1_tx.Init.Mode = DMA_NORMAL;
-    hdma_usart1_tx.Init.Priority = DMA_PRIORITY_LOW;
-    if (HAL_DMA_Init(&hdma_usart1_tx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(uartHandle,hdmatx,hdma_usart1_tx);
 
     /* USART1 interrupt Init */
     HAL_NVIC_SetPriority(USART1_IRQn, 5, 0);
@@ -186,7 +148,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
 
     GPIO_InitStruct.Pin = GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* USART2 interrupt Init */
@@ -214,10 +176,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     PA10     ------> USART1_RX
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
-
-    /* USART1 DMA DeInit */
-    HAL_DMA_DeInit(uartHandle->hdmarx);
-    HAL_DMA_DeInit(uartHandle->hdmatx);
 
     /* USART1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(USART1_IRQn);
@@ -265,7 +223,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 */
 void Usart_SendString(UART_HandleTypeDef *huart, uint8_t *str, uint16_t len)
 {
-  // 使用HAL库的阻塞方式发送
   HAL_UART_Transmit(huart, str, len, HAL_MAX_DELAY);
 }
 
@@ -297,4 +254,39 @@ void UsartPrintf(UART_HandleTypeDef *huart, const char *fmt, ...)
     HAL_UART_Transmit(huart, (uint8_t*)buffer, len, HAL_MAX_DELAY);
   }
 }
+
+uint8_t rxData1, rxData2;
+// 启动中断
+void UART1_Receive_Start() {
+  HAL_UART_Receive_IT(&huart1, &rxData1, 1);
+  
+}
+
+void UART2_Receive_Start() {
+  HAL_UART_Receive_IT(&huart2, &rxData2, 1);
+}
+
+/**
+  * @brief 串口接收中断
+  * @param huart: UART 句柄指针
+  * @param Size
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if(huart->Instance == USART1)
+  {
+    // 接收到被控对象返回的数据后，将接收到的一字节数据rxData1塞进 CmdDataQueue 中，并在DataTask任务中进行处理
+    uint8_t data = rxData1;
+    osMessageQueuePut(CmdDataQueueHandle, &data, 0, 0);
+    HAL_UART_Receive_IT(&huart1, &rxData1, 1);
+  }
+  else if (huart->Instance == USART2)
+  {
+    // 接收到发给串口2的数据后，将信息塞进队列CmdCtrlQueue，并在CmdCtrlTask任务中进行处理
+    uint8_t data = rxData2;
+    osMessageQueuePut(CmdCtrlQueueHandle, &data, 0, 0);
+    HAL_UART_Receive_IT(&huart2, &rxData2, 1);
+  }
+}
+
 /* USER CODE END 1 */

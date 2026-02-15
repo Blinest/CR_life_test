@@ -39,26 +39,24 @@ extern UART_HandleTypeDef huart1;
 
 extern UART_HandleTypeDef huart2;
 
-
-
 /* USER CODE BEGIN Private defines */
-extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart1_tx;
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-extern __IO bool rxFrameFlag;
-extern __IO uint8_t rxCmd[FIFO_SIZE];
-extern __IO uint8_t rxCount;
+extern __IO bool rxFrameFlag1;
+extern __IO uint8_t rxCmd1[FIFO_SIZE];
+extern __IO uint8_t rxCount1;
 extern __IO bool rxFrameFlag2;     // USART2 帧接收完成标志
 extern __IO uint8_t rxCmd2[FIFO_SIZE]; // USART2 接收缓冲区
 extern __IO uint8_t rxCount2;           // USART2 接收数据长度
 
 void Usart_SendString(UART_HandleTypeDef* huart, unsigned char *str, unsigned short len);
 void UsartPrintf(UART_HandleTypeDef* huart, const char *fmt,...);
+void UART1_Receive_Start();
+void UART2_Receive_Start();
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
@@ -66,4 +64,3 @@ void UsartPrintf(UART_HandleTypeDef* huart, const char *fmt,...);
 #endif
 
 #endif /* __USART_H__ */
-

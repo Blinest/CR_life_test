@@ -19,7 +19,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-#include "dma.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -81,6 +80,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+  /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
@@ -91,22 +91,27 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  /* 在调度器启动前挂上 USART2 接收中断，否则 HAL 不会在 RXNE 中断里调用 HAL_UART_RxCpltCallback */
+  UART2_Receive_Start();
+  // 启动串口1的中断接收
+  UART1_Receive_Start();
   // test
-  for(int i = 0; i < 2; i++) {
+  for(int i = 0; i < 4; i++) {
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     HAL_Delay(500);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     HAL_Delay(500);
   }
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-  
+
+  /*
   ESP8266_Init();
   while(OneNet_DevLink())		//接入OneNET
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    */
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -122,6 +127,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -171,29 +177,6 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 
-/**
-  * @brief USART1 处理 IDLE 中断
-  * @param huart: UART 句柄指针
-  * @param Size
-  */
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
-{
-  if(huart->Instance == USART1)
-  {
-    // 保存接收到的数据长度
-    rxCount = Size;
-    Usart_SendString(&huart2, "HAL_UARTEx_RxEventCallback",32);
-    HAL_UARTEx_ReceiveToIdle_DMA(huart, rxCmd, sizeof(rxCmd));
-    __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
-
-    // 设置帧接收完成标志
-    rxFrameFlag = true;
-  }
-  else if (huart->Instance == USART2)
-  {
-    //TODO:串口2回调处理
-  }
-}
 
 /* USER CODE END 4 */
 

@@ -25,7 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Types/MotorType.h"
+#include "Types/SensorType.h"
+#include "Types/CmdCtrlType.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,43 +60,39 @@ const osMutexAttr_t Usart2Mutex_attributes = {
   .name = "Usart2Mutex"
 };
 /* USER CODE END Variables */
-/* Definitions for PressSignTask */
-osThreadId_t PressSignTaskHandle;
-const osThreadAttr_t PressSignTask_attributes = {
-  .name = "PressSignTask",
+/* Definitions for DataTask */
+osThreadId_t DataTaskHandle;
+const osThreadAttr_t DataTask_attributes = {
+  .name = "DataTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for MotorCtrlTask */
-osThreadId_t MotorCtrlTaskHandle;
-const osThreadAttr_t MotorCtrlTask_attributes = {
-  .name = "MotorCtrlTask",
+/* Definitions for CmdCtrlTask */
+osThreadId_t CmdCtrlTaskHandle;
+const osThreadAttr_t CmdCtrlTask_attributes = {
+  .name = "CmdCtrlTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
-/* Definitions for MotorDataTask */
-osThreadId_t MotorDataTaskHandle;
-const osThreadAttr_t MotorDataTask_attributes = {
-  .name = "MotorDataTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+/* Definitions for CmdDataQueue */
+osMessageQueueId_t CmdDataQueueHandle;
+const osMessageQueueAttr_t CmdDataQueue_attributes = {
+  .name = "CmdDataQueue"
 };
-/* Definitions for PressDataTask */
-osThreadId_t PressDataTaskHandle;
-const osThreadAttr_t PressDataTask_attributes = {
-  .name = "PressDataTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+/* Definitions for SensorMessageQueue */
+osMessageQueueId_t SensorMessageQueueHandle;
+const osMessageQueueAttr_t SensorMessageQueue_attributes = {
+  .name = "SensorMessageQueue"
 };
-/* Definitions for PressQueue */
-osMessageQueueId_t PressQueueHandle;
-const osMessageQueueAttr_t PressQueue_attributes = {
-  .name = "PressQueue"
+/* Definitions for CmdCtrlQueue */
+osMessageQueueId_t CmdCtrlQueueHandle;
+const osMessageQueueAttr_t CmdCtrlQueue_attributes = {
+  .name = "CmdCtrlQueue"
 };
-/* Definitions for MotorQueue */
-osMessageQueueId_t MotorQueueHandle;
-const osMessageQueueAttr_t MotorQueue_attributes = {
-  .name = "MotorQueue"
+/* Definitions for CmdQueue */
+osMessageQueueId_t CmdQueueHandle;
+const osMessageQueueAttr_t CmdQueue_attributes = {
+  .name = "CmdQueue"
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,10 +100,8 @@ const osMessageQueueAttr_t MotorQueue_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartPressSignTask(void *argument);
-extern void StartMotorCtrlTask(void *argument);
-extern void StartMotorDataTask(void *argument);
-extern void StartPressDataTask(void *argument);
+void StartDataTask(void *argument);
+extern void StartCmdCtrlTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -137,28 +132,28 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the queue(s) */
-  /* creation of PressQueue */
-  PressQueueHandle = osMessageQueueNew (16, sizeof(uint16_t), &PressQueue_attributes);
+  /* creation of CmdDataQueue */
+  CmdDataQueueHandle = osMessageQueueNew (16, sizeof(uint8_t), &CmdDataQueue_attributes);
 
-  /* creation of MotorQueue */
-  MotorQueueHandle = osMessageQueueNew (16, sizeof(MotorMessage*), &MotorQueue_attributes);
+  /* creation of SensorMessageQueue */
+  SensorMessageQueueHandle = osMessageQueueNew (16, sizeof(SensorMessage*), &SensorMessageQueue_attributes);
+
+  /* creation of CmdCtrlQueue */
+  CmdCtrlQueueHandle = osMessageQueueNew (16, sizeof(uint8_t), &CmdCtrlQueue_attributes);
+
+  /* creation of CmdQueue */
+  CmdQueueHandle = osMessageQueueNew (16, sizeof(uint8_t), &CmdQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of PressSignTask */
-  PressSignTaskHandle = osThreadNew(StartPressSignTask, NULL, &PressSignTask_attributes);
+  /* creation of DataTask */
+  DataTaskHandle = osThreadNew(StartDataTask, NULL, &DataTask_attributes);
 
-  /* creation of MotorCtrlTask */
-  MotorCtrlTaskHandle = osThreadNew(StartMotorCtrlTask, NULL, &MotorCtrlTask_attributes);
-
-  /* creation of MotorDataTask */
-  MotorDataTaskHandle = osThreadNew(StartMotorDataTask, NULL, &MotorDataTask_attributes);
-
-  /* creation of PressDataTask */
-  PressDataTaskHandle = osThreadNew(StartPressDataTask, NULL, &PressDataTask_attributes);
+  /* creation of CmdCtrlTask */
+  CmdCtrlTaskHandle = osThreadNew(StartCmdCtrlTask, NULL, &CmdCtrlTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -170,22 +165,22 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartPressSignTask */
+/* USER CODE BEGIN Header_StartDataTask */
 /**
-  * @brief  Function implementing the PressSignTask thread.
+  * @brief  Function implementing the DataTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartPressSignTask */
-__weak void StartPressSignTask(void *argument)
+/* USER CODE END Header_StartDataTask */
+__weak void StartDataTask(void *argument)
 {
-  /* USER CODE BEGIN StartPressSignTask */
+  /* USER CODE BEGIN StartDataTask */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END StartPressSignTask */
+  /* USER CODE END StartDataTask */
 }
 
 /* Private application code --------------------------------------------------*/

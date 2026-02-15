@@ -9,33 +9,46 @@
 ***	qq：1071378062
 **********************************************************/
 
-#define MOTOR_NUM 6 //定义电机数量
-typedef struct Steppter_Motor
+#define MOTOR_NUM 3 // 定义电机数量
+#define MOTOR_ID 4 // 定义电机起始 ID
+// ==================== 步进电机参数 ====================
+
+typedef struct StepperMotor
 {
     uint8_t daocheng;
-    uint16_t speed_max;
     uint8_t xifen;
-    uint8_t SM_MAX;
-    uint8_t SM_MIN;
-    uint8_t current_positon;
-    uint8_t last_position;
-    uint8_t acc;
+    double step_angle;
+    uint8_t current_pos; // mm
+    uint8_t current_vel; // mm/s
+    uint8_t target_pos; // mm
+    uint8_t target_vel; // mm/s
+} StepperMotor;
 
-} SM;
-
+// ==================== 电机参数 ====================
 typedef struct Motor
 {
-    SM steppter_motor;
-    bool motor_status[MOTOR_NUM+1];
-    uint32_t last_response_time[MOTOR_NUM+1];
-    uint32_t timeout_threshold;
-    bool motor_enabled[MOTOR_NUM+1]; // 接收电机是否使能
-    __IO bool motor_responding[MOTOR_NUM+1]; //
+    int id;
+    bool state;
+    StepperMotor stepper_motor;
+    uint8_t last_response_time;
+    uint8_t timeout_threshold;
+    uint8_t current_pos; // rad
+    uint8_t  current_vel; // rpm -> rad/s
+    uint8_t  current_acc; // rad/s^2
+    uint8_t target_pos;
+    uint8_t target_vel;
+    uint8_t target_acc;
+    float vel_max;
+    uint8_t size;
+    __IO bool motor_responding; //
+    uint32_t cmd[16];
 } Motor;
 
 void motor_init(void);
+void motor_system_info(int addr, Motor motor);
+void motor_enable(int addr, bool state);
 void motor_run(int addr, uint16_t speed, float deltaL, bool snf);
 void motor_position_control_snf(float cur[], float target[], int size);
 void motor_emergency_stop_all(void);
-extern Motor motor;
+extern Motor motor[MOTOR_NUM];
 #endif

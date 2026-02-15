@@ -1,8 +1,7 @@
-#include <stdint.h>
-#include <math.h>
-#include "kinematic.h"
-#include "Emm_V5.h"
+#include "BSP/Motor/kinematic.h"
 
+#include <math.h>
+#include <stdint.h>
 
 #define pi 3.1415926535
 
